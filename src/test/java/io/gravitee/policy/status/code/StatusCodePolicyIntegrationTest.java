@@ -27,19 +27,22 @@ public class StatusCodePolicyIntegrationTest extends AbstractGatewayTest {
     @Override
     @BeforeEach
     public void setUp(Vertx vertx) throws Exception {
+        // Initialize the application context
         this.applicationContext = new AnnotationConfigApplicationContext();
+
+        // Initialize WireMock (calls prepareWireMock() internally)
+        this.init();
+
+        // Set up WireMock stubs after WireMock is initialized
+        wiremock.stubFor(get(urlEqualTo("/test")).willReturn(aResponse().withStatus(202).withBody("Accepted")));
+
+        // Proceed with the rest of the setup
         super.setUp(vertx);
     }
 
     @Override
     protected void configureGateway(GatewayConfigurationBuilder gatewayConfigurationBuilder) {
         gatewayConfigurationBuilder.set("http.port", gatewayPort());
-    }
-
-    @BeforeEach
-    public void init() {
-        // Set up WireMock to return a 202 Accepted response for the /test endpoint
-        wiremock.stubFor(get(urlEqualTo("/test")).willReturn(aResponse().withStatus(202).withBody("Accepted")));
     }
 
     @Test
@@ -95,14 +98,15 @@ public class StatusCodePolicyIntegrationTest extends AbstractGatewayTest {
         step.setPolicy("status-code-policy");
         // Configure the policy with mappings to transform 202 to 200
         step.setConfiguration(
-                "{\n" +
-                        "  \"statusMappings\": [\n" +
-                        "    {\n" +
-                        "      \"inputStatusCode\": 202,\n" +
-                        "      \"outputStatusCode\": 200\n" +
-                        "    }\n" +
-                        "  ]\n" +
-                        "}"
+                """
+                        {
+                          "statusMappings": [
+                            {
+                              "inputStatusCode": 202,
+                              "outputStatusCode": 200
+                            }
+                          ]
+                        }"""
         );
         step.setEnabled(true);
 
