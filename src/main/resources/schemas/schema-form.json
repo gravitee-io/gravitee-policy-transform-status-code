@@ -1,0 +1,33 @@
+{
+    "type": "object",
+    "id": "urn:jsonschema:io:gravitee:policy:status:code:configuration:StatusCodePolicyConfiguration",
+    "properties": {
+        "statusMappings": {
+            "type": "array",
+            "title": "Status Mappings",
+            "items": {
+                "type": "object",
+                "id": "urn:jsonschema:io:gravitee:policy:status:code:configuration:StatusMapping",
+                "title": "Status Mapping",
+                "properties": {
+                    "inputStatusCode": {
+                        "type": "integer",
+                        "title": "Input Status Code",
+                        "minimum": 100,
+                        "maximum": 599,
+                        "description": "Enter an HTTP status code between 100 and 599."
+                    },
+                    "outputStatusCode": {
+                        "type": "integer",
+                        "title": "Output Status Code",
+                        "minimum": 100,
+                        "maximum": 599,
+                        "description": "Enter an HTTP status code between 100 and 599."
+                    }
+                },
+                "required": ["inputStatusCode", "outputStatusCode"]
+            }
+        }
+    },
+    "required": ["statusMappings"]
+}
