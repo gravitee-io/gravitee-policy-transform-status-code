@@ -4,6 +4,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static io.vertx.core.http.HttpMethod.GET;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import io.gravitee.apim.gateway.tests.sdk.AbstractGatewayTest;
 import io.gravitee.apim.gateway.tests.sdk.configuration.GatewayConfigurationBuilder;
 import io.gravitee.definition.model.Api;
@@ -23,6 +24,8 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 public class StatusCodePolicyIntegrationTest extends AbstractGatewayTest {
 
+    private static final int WIREMOCK_PORT = 8089;
+
     @Override
     @BeforeEach
     public void setUp(Vertx vertx) throws Exception {
@@ -30,19 +33,21 @@ public class StatusCodePolicyIntegrationTest extends AbstractGatewayTest {
         this.applicationContext = new AnnotationConfigApplicationContext();
         ((AnnotationConfigApplicationContext) applicationContext).refresh(); // Refresh the context to initialize it
 
-        // Initialize WireMock (calls prepareWireMock() internally)
-        this.init();
-
-        // Set up WireMock stubs after WireMock is initialized
-        wiremock.stubFor(get(urlEqualTo("/test")).willReturn(aResponse().withStatus(202).withBody("Accepted")));
-
         // Proceed with the rest of the setup
         super.setUp(vertx);
+
+        // Now wiremock is initialized, set up stubs
+        wiremock.stubFor(get(urlEqualTo("/test")).willReturn(aResponse().withStatus(202).withBody("Accepted")));
     }
 
     @Override
     protected void configureGateway(GatewayConfigurationBuilder gatewayConfigurationBuilder) {
         gatewayConfigurationBuilder.set("http.port", gatewayPort());
+    }
+
+    @Override
+    protected void configureWireMock(WireMockConfiguration configuration) {
+        configuration.port(WIREMOCK_PORT);
     }
 
     @Test
@@ -54,10 +59,10 @@ public class StatusCodePolicyIntegrationTest extends AbstractGatewayTest {
 
         // Send a request to the gateway
         var response = client
-            .request(GET, gatewayPort(), "localhost", "/test")
-            .flatMap(HttpClientRequest::send)
-            .flatMap(resp -> resp.body().map(body -> java.util.Map.entry(resp, body)))
-            .blockingGet();
+                .request(GET, gatewayPort(), "localhost", "/test")
+                .flatMap(HttpClientRequest::send)
+                .flatMap(resp -> resp.body().map(body -> java.util.Map.entry(resp, body)))
+                .blockingGet();
 
         // Then
         assertThat(response.getKey().statusCode()).isEqualTo(200); // Verify the status code is transformed to 200
@@ -67,8 +72,8 @@ public class StatusCodePolicyIntegrationTest extends AbstractGatewayTest {
 
     @Override
     public void configureApi(Api api) {
-        // Set the API's backend to point to the mock backend
-        api.getProxy().getGroups().iterator().next().getEndpoints().iterator().next().setTarget("http://localhost:" + wiremock.port());
+        // Set the API's backend to point to the mock backend using the fixed port
+        api.getProxy().getGroups().iterator().next().getEndpoints().iterator().next().setTarget("http://localhost:" + WIREMOCK_PORT);
 
         // Configure the API with a flow that applies the StatusCodePolicy on the RESPONSE phase
         Flow flow = new Flow();
@@ -90,15 +95,15 @@ public class StatusCodePolicyIntegrationTest extends AbstractGatewayTest {
         step.setPolicy("status-code-policy");
         // Configure the policy with mappings to transform 202 to 200
         step.setConfiguration(
-            """
-                {
-                  "statusMappings": [
+                """
                     {
-                      "inputStatusCode": 202,
-                      "outputStatusCode": 200
-                    }
-                  ]
-                }"""
+                      "statusMappings": [
+                        {
+                          "inputStatusCode": 202,
+                          "outputStatusCode": 200
+                        }
+                      ]
+                    }"""
         );
         step.setEnabled(true);
 
