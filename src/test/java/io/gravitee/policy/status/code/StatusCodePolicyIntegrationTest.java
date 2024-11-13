@@ -1,5 +1,9 @@
 package io.gravitee.policy.status.code;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static io.vertx.core.http.HttpMethod.GET;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.gravitee.apim.gateway.tests.sdk.AbstractGatewayTest;
 import io.gravitee.apim.gateway.tests.sdk.configuration.GatewayConfigurationBuilder;
 import io.gravitee.definition.model.Api;
@@ -11,16 +15,11 @@ import io.vertx.core.http.HttpClientOptions;
 import io.vertx.rxjava3.core.Vertx;
 import io.vertx.rxjava3.core.http.HttpClient;
 import io.vertx.rxjava3.core.http.HttpClientRequest;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.util.List;
-import java.util.Set;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static io.vertx.core.http.HttpMethod.GET;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class StatusCodePolicyIntegrationTest extends AbstractGatewayTest {
 
@@ -29,6 +28,7 @@ public class StatusCodePolicyIntegrationTest extends AbstractGatewayTest {
     public void setUp(Vertx vertx) throws Exception {
         // Initialize the application context
         this.applicationContext = new AnnotationConfigApplicationContext();
+        ((AnnotationConfigApplicationContext) applicationContext).refresh(); // Refresh the context to initialize it
 
         // Initialize WireMock (calls prepareWireMock() internally)
         this.init();
@@ -54,10 +54,10 @@ public class StatusCodePolicyIntegrationTest extends AbstractGatewayTest {
 
         // Send a request to the gateway
         var response = client
-                .request(GET, gatewayPort(), "localhost", "/test")
-                .flatMap(HttpClientRequest::send)
-                .flatMap(resp -> resp.body().map(body -> java.util.Map.entry(resp, body)))
-                .blockingGet();
+            .request(GET, gatewayPort(), "localhost", "/test")
+            .flatMap(HttpClientRequest::send)
+            .flatMap(resp -> resp.body().map(body -> java.util.Map.entry(resp, body)))
+            .blockingGet();
 
         // Then
         assertThat(response.getKey().statusCode()).isEqualTo(200); // Verify the status code is transformed to 200
@@ -68,15 +68,7 @@ public class StatusCodePolicyIntegrationTest extends AbstractGatewayTest {
     @Override
     public void configureApi(Api api) {
         // Set the API's backend to point to the mock backend
-        api
-                .getProxy()
-                .getGroups()
-                .iterator()
-                .next()
-                .getEndpoints()
-                .iterator()
-                .next()
-                .setTarget("http://localhost:" + wiremock.port());
+        api.getProxy().getGroups().iterator().next().getEndpoints().iterator().next().setTarget("http://localhost:" + wiremock.port());
 
         // Configure the API with a flow that applies the StatusCodePolicy on the RESPONSE phase
         Flow flow = new Flow();
@@ -98,15 +90,15 @@ public class StatusCodePolicyIntegrationTest extends AbstractGatewayTest {
         step.setPolicy("status-code-policy");
         // Configure the policy with mappings to transform 202 to 200
         step.setConfiguration(
-                """
-                        {
-                          "statusMappings": [
-                            {
-                              "inputStatusCode": 202,
-                              "outputStatusCode": 200
-                            }
-                          ]
-                        }"""
+            """
+                {
+                  "statusMappings": [
+                    {
+                      "inputStatusCode": 202,
+                      "outputStatusCode": 200
+                    }
+                  ]
+                }"""
         );
         step.setEnabled(true);
 
