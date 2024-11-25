@@ -74,6 +74,8 @@ In this configuration:
 
 - **Status Code Only**: The policy only modifies the response status code. It does not alter the response body or headers.
 
+- **Status code range**: The policy only modifies HTTP status codes in the range from 100 till 599 only. For example it will not be possible to modify HTTP status code 600, or 703.
+
 - **No Matching Mapping**: If the response status code does not match any input status code in the mappings, the original status code is retained.
 
 == Attributes
@@ -89,7 +91,7 @@ The `status-code` policy does not generate errors on its own. It operates silent
 |===
 |Plugin Version | APIM Version
 
-|1.x            | 3.x to latest
+|1.x            | 4.2.x to latest
 |===
 
 == Related Information
