@@ -1,0 +1,90 @@
+{
+    "id": "status-code-policy-test-api",
+    "name": "Status Code Policy Test API",
+    "gravitee": "4.0.0",
+    "type": "proxy",
+    "listeners": [
+        {
+            "type": "http",
+            "paths": [
+                {
+                    "path": "/status-code-policy"
+                }
+            ],
+            "entrypoints": [
+                {
+                    "type": "http-proxy"
+                }
+            ]
+        }
+    ],
+    "endpointGroups": [
+        {
+            "name": "default-group",
+            "type": "http-proxy",
+            "endpoints": [
+                {
+                    "name": "default",
+                    "type": "http-proxy",
+                    "weight": 1,
+                    "inheritConfiguration": false,
+                    "configuration": {
+                        "target": "http://localhost:8080/endpoint"
+                    },
+                    "sharedConfigurationOverride": {
+                        "http": {
+                            "connectTimeout": 3000,
+                            "readTimeout": 60000
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "flows": [
+        {
+            "name": "flow-1",
+            "enabled": true,
+            "selectors": [
+                {
+                    "type": "http",
+                    "path": "/",
+                    "pathOperator": "START_WITH",
+                    "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+                }
+            ],
+            "request": [],
+            "response": [
+                {
+                    "name": "Status Code Transformation Policy",
+                    "policy": "status-code",
+                    "enabled": true,
+                    "configuration": {
+                        "statusMappings": [
+                            {
+                                "inputStatusCode": 201,
+                                "outputStatusCode": 200
+                            },
+                            {
+                                "inputStatusCode": 419,
+                                "outputStatusCode": 401
+                            },
+                            {
+                                "inputStatusCode": 404,
+                                "outputStatusCode": 200
+                            },
+                            {
+                                "inputStatusCode": 515,
+                                "outputStatusCode": 505
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "analytics": {
+        "enabled": false
+    },
+    "resources": []
+}
