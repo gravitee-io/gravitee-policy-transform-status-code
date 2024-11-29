@@ -147,6 +147,7 @@
             <groupId>io.gravitee.apim.plugin.endpoint</groupId>
             <artifactId>gravitee-apim-plugin-endpoint-http-proxy</artifactId>
             <version>${gravitee-apim.version}</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
