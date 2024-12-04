@@ -20,8 +20,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.graviteesource.entrypoint.http.get.HttpGetEntrypointConnectorFactory;
-import com.graviteesource.entrypoint.http.post.HttpGetEntrypointConnectorFactory;
 import io.gravitee.apim.gateway.tests.sdk.AbstractPolicyTest;
 import io.gravitee.apim.gateway.tests.sdk.annotations.DeployApi;
 import io.gravitee.apim.gateway.tests.sdk.annotations.GatewayTest;
