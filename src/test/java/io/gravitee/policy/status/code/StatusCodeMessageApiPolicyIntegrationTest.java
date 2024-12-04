@@ -15,33 +15,30 @@
  */
 package io.gravitee.policy.status.code;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.graviteesource.entrypoint.http.get.HttpGetEntrypointConnectorFactory;
+import com.graviteesource.entrypoint.http.post.HttpGetEntrypointConnectorFactory;
 import io.gravitee.apim.gateway.tests.sdk.AbstractPolicyTest;
 import io.gravitee.apim.gateway.tests.sdk.annotations.DeployApi;
 import io.gravitee.apim.gateway.tests.sdk.annotations.GatewayTest;
 import io.gravitee.apim.gateway.tests.sdk.connector.EndpointBuilder;
 import io.gravitee.apim.gateway.tests.sdk.connector.EntrypointBuilder;
 import io.gravitee.plugin.endpoint.EndpointConnectorPlugin;
-import com.graviteesource.entrypoint.http.get.HttpGetEntrypointConnectorFactory;
-import com.graviteesource.entrypoint.http.post.HttpGetEntrypointConnectorFactory;
 import io.gravitee.plugin.entrypoint.EntrypointConnectorPlugin;
 import io.gravitee.plugin.entrypoint.http.proxy.HttpProxyEntrypointConnectorFactory;
 import io.gravitee.policy.status.code.configuration.StatusCodePolicyConfiguration;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.rxjava3.core.http.HttpClient;
 import io.vertx.rxjava3.core.http.HttpClientRequest;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
-
-
-
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @GatewayTest
 @DeployApi({ "/apis/status-code-policy-mappings.json" })
