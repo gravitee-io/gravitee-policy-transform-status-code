@@ -44,6 +44,8 @@
         <gravitee-policy-api.version>1.11.0</gravitee-policy-api.version>
         <gravitee-apim.version>4.2.23</gravitee-apim.version>
         <gravitee-reactor-message.version>2.0.0</gravitee-reactor-message.version>
+        <gravitee-entrypoint-http-get.version>1.2.0</gravitee-entrypoint-http-get.version>
+        <gravitee-entrypoint-http-post.version>1.2.0</gravitee-entrypoint-http-post.version>
 
         <maven-plugin-assembly.version>3.7.1</maven-plugin-assembly.version>
         <maven-plugin-properties.version>1.2.1</maven-plugin-properties.version>
@@ -121,6 +123,24 @@
             <groupId>io.gravitee.apim.plugin.entrypoint</groupId>
             <artifactId>gravitee-apim-plugin-entrypoint-http-proxy</artifactId>
             <version>${gravitee-apim.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.gravitee.apim.plugin.entrypoint</groupId>
+            <artifactId>gravitee-apim-plugin-entrypoint-http-proxy</artifactId>
+            <version>${gravitee-apim.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.graviteesource.entrypoint</groupId>
+            <artifactId>gravitee-entrypoint-http-get</artifactId>
+            <version>${gravitee-entrypoint-http-get.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.graviteesource.entrypoint</groupId>
+            <artifactId>gravitee-entrypoint-http-post</artifactId>
+            <version>${gravitee-entrypoint-http-post.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
