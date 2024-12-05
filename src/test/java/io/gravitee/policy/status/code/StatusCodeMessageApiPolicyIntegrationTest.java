@@ -19,6 +19,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.graviteesource.entrypoint.http.get.HttpGetEntrypointConnectorFactory;
 import com.graviteesource.entrypoint.http.post.HttpPostEntrypointConnectorFactory;
 import com.graviteesource.reactor.message.MessageApiReactorFactory;
 import io.gravitee.apim.gateway.tests.sdk.AbstractPolicyTest;
@@ -36,7 +37,6 @@ import io.gravitee.gateway.reactive.reactor.v4.reactor.ReactorFactory;
 import io.gravitee.plugin.entrypoint.EntrypointConnectorPlugin;
 import io.gravitee.plugin.policy.PolicyPlugin;
 import io.gravitee.policy.status.code.configuration.StatusCodePolicyConfiguration;
-import com.graviteesource.entrypoint.http.get.HttpGetEntrypointConnectorFactory;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
@@ -46,14 +46,12 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava3.core.buffer.Buffer;
 import io.vertx.rxjava3.core.http.HttpClient;
-
+import io.vertx.rxjava3.core.http.HttpClientResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import io.vertx.rxjava3.core.http.HttpClientResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -100,23 +98,23 @@ public class StatusCodeMessageApiPolicyIntegrationTest extends AbstractPolicyTes
     }
 
     @Test
-    @DeployApi({"/apis/message-http-get-status-code-policy-mappings.json"})
+    @DeployApi({ "/apis/message-http-get-status-code-policy-mappings.json" })
     void should_receive_messages_limited_by_message_count_limit(HttpClient httpClient) {
         final int messageCount = 12;
 
         final TestSubscriber<JsonObject> obs = createGetRequest("/status-code-policy", MediaType.APPLICATION_JSON, httpClient)
-                .doOnSuccess(response -> assertThat(response.statusCode()).isEqualTo(201))
-                .flatMapPublisher(response -> response.rxBody().flatMapPublisher(this::extractMessages))
-                .test()
-                .awaitDone(30, TimeUnit.SECONDS)
-                .assertValueCount(messageCount)
-                .assertComplete();
+            .doOnSuccess(response -> assertThat(response.statusCode()).isEqualTo(201))
+            .flatMapPublisher(response -> response.rxBody().flatMapPublisher(this::extractMessages))
+            .test()
+            .awaitDone(30, TimeUnit.SECONDS)
+            .assertValueCount(messageCount)
+            .assertComplete();
 
         verifyMessagesAreOrdered(messageCount, obs);
     }
 
     @Test
-    @DeployApi({"/apis/message-http-post-status-code-policy-mappings.json"})
+    @DeployApi({ "/apis/message-http-post-status-code-policy-mappings.json" })
     void should_receive_messages_limited_by_message_count_limit_post(HttpClient httpClient) {
         JsonObject requestBody = new JsonObject();
         requestBody.put("field", "value");
@@ -124,14 +122,14 @@ public class StatusCodeMessageApiPolicyIntegrationTest extends AbstractPolicyTes
         postMessage(httpClient, "/test", requestBody, Map.of("X-Test-Header", "header-value")).test().awaitDone(30, TimeUnit.SECONDS);
 
         messageStorage
-                .subject()
-                .take(1)
-                .test()
-                .assertValue(message -> {
-                    assertThat(message.headers().size()).isEqualTo(0);
-                    assertThat(new JsonObject(message.content().toString())).isEqualTo(requestBody);
-                    return true;
-                });
+            .subject()
+            .take(1)
+            .test()
+            .assertValue(message -> {
+                assertThat(message.headers().size()).isEqualTo(0);
+                assertThat(new JsonObject(message.content().toString())).isEqualTo(requestBody);
+                return true;
+            });
     }
 
     private Flowable<JsonObject> extractMessages(Buffer body) {
@@ -145,8 +143,6 @@ public class StatusCodeMessageApiPolicyIntegrationTest extends AbstractPolicyTes
 
         return Flowable.fromIterable(messages);
     }
-
-
 
     private Flowable<JsonObject> extractPlainTextMessages(Buffer body) {
         final List<JsonObject> messages = new ArrayList<>();
@@ -173,37 +169,37 @@ public class StatusCodeMessageApiPolicyIntegrationTest extends AbstractPolicyTes
         for (int i = 0; i < messageCount; i++) {
             final int counter = i;
             obs.assertValueAt(
-                    i,
-                    jsonObject -> {
-                        final Integer messageCounter = Integer.parseInt(jsonObject.getString("id"));
-                        assertThat(messageCounter).isEqualTo(counter);
-                        assertThat(jsonObject.getString("content")).matches("message");
+                i,
+                jsonObject -> {
+                    final Integer messageCounter = Integer.parseInt(jsonObject.getString("id"));
+                    assertThat(messageCounter).isEqualTo(counter);
+                    assertThat(jsonObject.getString("content")).matches("message");
 
-                        return true;
-                    }
+                    return true;
+                }
             );
         }
     }
 
     private Single<HttpClientResponse> createGetRequest(String path, String accept, HttpClient httpClient) {
         return httpClient
-                .rxRequest(HttpMethod.GET, path)
-                .flatMap(request -> {
-                    request.putHeader(HttpHeaderNames.ACCEPT.toString(), accept);
-                    return request.rxSend();
-                });
+            .rxRequest(HttpMethod.GET, path)
+            .flatMap(request -> {
+                request.putHeader(HttpHeaderNames.ACCEPT.toString(), accept);
+                return request.rxSend();
+            });
     }
 
     private Completable postMessage(HttpClient client, String requestURI, JsonObject requestBody, Map<String, String> headers) {
         return client
-                .rxRequest(HttpMethod.POST, requestURI)
-                .flatMap(request -> {
-                    headers.forEach(request::putHeader);
-                    return request.rxSend(requestBody.toString());
-                })
-                .flatMapCompletable(response -> {
-                    assertThat(response.statusCode()).isEqualTo(202);
-                    return response.rxBody().ignoreElement();
-                });
+            .rxRequest(HttpMethod.POST, requestURI)
+            .flatMap(request -> {
+                headers.forEach(request::putHeader);
+                return request.rxSend(requestBody.toString());
+            })
+            .flatMapCompletable(response -> {
+                assertThat(response.statusCode()).isEqualTo(202);
+                return response.rxBody().ignoreElement();
+            });
     }
 }

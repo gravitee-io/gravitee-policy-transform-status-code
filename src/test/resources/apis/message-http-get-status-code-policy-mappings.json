@@ -15,7 +15,7 @@
                 {
                     "type": "http-get",
                     "configuration": {
-                        "messagesLimitCount":  12,
+                        "messagesLimitCount": 12,
                         "messagesLimitDurationMs": 500
                     }
                 }
