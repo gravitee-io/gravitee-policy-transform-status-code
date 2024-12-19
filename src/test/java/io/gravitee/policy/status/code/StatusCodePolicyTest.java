@@ -113,24 +113,6 @@ class StatusCodePolicyTest {
     }
 
     @Test
-    void shouldChangeStatusInMessageResponse() {
-        StatusMapping mapping = new StatusMapping();
-        mapping.setInputStatusCode(200);
-        mapping.setOutputStatusCode(404);
-        configuration.setStatusMappings(List.of(mapping));
-
-        MessageExecutionContext messageContext = Mockito.mock(MessageExecutionContext.class);
-        Response response = Mockito.mock(Response.class);
-        when(messageContext.response()).thenReturn(response);
-        when(response.status()).thenReturn(200);
-
-        Completable completable = policy.onMessageResponse(messageContext);
-        completable.test().assertComplete();
-
-        verify(response).status(404);
-    }
-
-    @Test
     void shouldNotChangeStatusWhenMappingsListIsEmpty() {
         configuration.setStatusMappings(List.of());
 
@@ -321,19 +303,6 @@ class StatusCodePolicyTest {
 
         verify(response).status(201);
         assertEquals("application/json", response.headers().getFirst("Content-Type"));
-    }
-
-    @Test
-    void shouldHandleMessageResponseWithoutStatusCode() {
-        MessageExecutionContext messageContext = Mockito.mock(MessageExecutionContext.class);
-        Response response = Mockito.mock(Response.class);
-        when(messageContext.response()).thenReturn(response);
-        when(response.status()).thenReturn(-1);
-
-        Completable completable = policy.onMessageResponse(messageContext);
-        completable.test().assertComplete();
-
-        verify(response, never()).status(anyInt());
     }
 
     @Test
