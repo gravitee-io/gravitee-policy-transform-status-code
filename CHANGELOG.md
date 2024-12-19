@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/gravitee-io/gravitee-policy-transform-status-code/compare/1.0.0...1.0.1) (2024-12-19)
+
+
+### Bug Fixes
+
+* fix mAPI Post status code transform ([87d7bb9](https://github.com/gravitee-io/gravitee-policy-transform-status-code/commit/87d7bb9c60aa521eeb45bcc0c547ca586697ab6a))
+
 # 1.0.0 (2024-11-29)
 
 
