@@ -58,9 +58,4 @@ public class StatusCodePolicy implements Policy {
             }
         });
     }
-
-    @Override
-    public Completable onMessageResponse(MessageExecutionContext ctx) {
-        return doOnResponse(ctx);
-    }
 }
