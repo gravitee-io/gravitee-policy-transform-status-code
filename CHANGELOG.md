@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/gravitee-io/gravitee-policy-transform-status-code/compare/1.0.1...1.0.2) (2025-01-07)
+
+
+### Bug Fixes
+
+* remove message response from accepted phases in the doc ([ffa92b9](https://github.com/gravitee-io/gravitee-policy-transform-status-code/commit/ffa92b9fba752ac7bc8836e52a760d75fbb2a839))
+
 ## [1.0.1](https://github.com/gravitee-io/gravitee-policy-transform-status-code/compare/1.0.0...1.0.1) (2024-12-19)
 
 
