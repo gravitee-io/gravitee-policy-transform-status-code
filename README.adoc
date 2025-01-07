@@ -3,9 +3,9 @@
 == Phase
 
 |===
-|onRequest |onResponse |onMessageResponse
+|onRequest |onResponse
 
-|          | X         | X
+|          | X
 |===
 
 == Description
