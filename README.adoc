@@ -86,12 +86,13 @@ This policy does not set or modify any specific attributes in the execution cont
 
 The `status-code` policy does not generate errors on its own. It operates silently, modifying the status code when a mapping is matched. If an exception occurs during policy execution, standard error handling mechanisms apply.
 
-== Compatibility with APIM
+== Compatibility matrix
 
 |===
-|Plugin Version | APIM Version
+| Plugin version | APIM            | Java version
 
-|1.x            | 4.2.x to latest
+| 2.x            | 4.9.x to latest | 21
+| 1.x            | 4.2.x to latest | 17
 |===
 
 == Related Information
